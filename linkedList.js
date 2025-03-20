@@ -266,34 +266,106 @@ LinkedList.prototype.find = function (value) {
     }
 }
 
-const test = () => {
-    let linkedList = new LinkedList();
-    console.log("Is empty:", linkedList.isEmpty());
-    console.log("Append: 1, 2, 3, 1");
-    linkedList.append(1);
-    linkedList.append(2);
-    linkedList.append(3);
-    linkedList.append(1);
-    console.log("Print:");
-    console.log(linkedList.print());
-    console.log("Prepend: 8, 7, 5");
-    linkedList.prepend(8);
-    linkedList.prepend(7);
-    linkedList.prepend(5);
-    console.log("Print:");
-    console.log(linkedList.print());
-    console.log("Remove: 1");
-    linkedList.removeValue(1);
-    console.log("Remove: 10");
-    linkedList.removeValue(10);
-    console.log("Is empty:", linkedList.isEmpty());
-    console.log("Print:");
-    console.log(linkedList.print());
-    console.log("Size:", linkedList.size());
-    console.log("Find 8:", linkedList.find(8));
-    console.log("Contains 8:", linkedList.contains(8));
-    console.log("Head:", linkedList.getHead());
-    console.log("Tail:", linkedList.getTail());
+function testInsertAndPrint() {
+    const list = new LinkedList();
+    console.log("=== testInsertAndPrint ===");
+    console.log("Initially empty?", list.isEmpty());
+    list.prepend("X");
+    console.log("After prepend('X'):", list.print());
+    list.append("Y");
+    list.append("Z");
+    console.log("After append('Y') & append('Z'):", list.print());
+    console.log("Is empty now?", list.isEmpty());
+    list.insert("NewHead", 0);
+    console.log("After insert('NewHead', 0):", list.print());
+    list.insert("Mid", 2);
+    console.log("After insert('Mid', 2):", list.print());
+    list.insert("BeyondEnd", 999);
+    console.log("After insert('BeyondEnd', 999):", list.print());
+    console.log("Size:", list.size());
+    console.log("Head:", list.getHead());
+    console.log("Tail:", list.getTail());
+    console.log("\n");
 }
 
-test();
+function testRemoveFirstAndLast() {
+    const list = new LinkedList();
+    console.log("=== testRemoveFirstAndLast ===");
+    list.append(1);
+    list.append(2);
+    list.append(3);
+    list.append(4);
+    console.log("Initial list:", list.print());
+    list.removeFirst();
+    console.log("After removeFirst:", list.print());
+    list.removeLast();
+    console.log("After removeLast:", list.print());
+    list.removeLast();
+    list.removeLast();
+    console.log("After removing everything:", list.print());
+    list.removeFirst(); 
+    console.log("removeFirst on empty:", list.print());
+    console.log("\n");
+}
+
+function testRemoveAtAndRemoveValue() {
+    const list = new LinkedList();
+    console.log("=== testRemoveAtAndRemoveValue ===");
+    list.append("A");
+    list.append("B");
+    list.append("C");
+    list.append("D");
+    list.append("E");
+    console.log("Initial list:", list.print());
+    list.removeAt(2);
+    console.log("After removeAt(2):", list.print());
+    list.removeValue("B");
+    console.log("After removeValue('B'):", list.print());
+    list.removeValue("XYZ");
+    console.log("After removeValue('XYZ'):", list.print());
+    list.removeAt(999);
+    console.log("After removeAt(999):", list.print());
+    console.log("\n");
+}
+
+function testGettersAndSearch() {
+    const list = new LinkedList();
+    console.log("=== testGettersAndSearch ===");
+
+    list.append(10);
+    list.append(20);
+    list.append(30);
+    console.log("List:", list.print());
+    console.log("Head:", list.getHead());
+    console.log("Tail:", list.getTail());
+    console.log("Contains(20)?", list.contains(20));
+    console.log("Contains(99)?", list.contains(99));
+    const foundNode = list.find(20);
+    console.log("find(20) => node with value:", foundNode ? foundNode.value : null);
+    console.log("\n");
+}
+
+function testEdgeCases() {
+    const list = new LinkedList();
+    console.log("=== testEdgeCases ===");
+    list.removeFirst();
+    list.removeLast();
+    list.removeAt(0);
+    list.removeValue("nothing");
+    console.log("After removals on empty list:", list.print());
+    list.insert("FirstInsert", 0);
+    console.log("After insert('FirstInsert', 0):", list.print());
+    list.insert("Appended", 999);
+    console.log("After insert('Appended', 999):", list.print());
+    console.log("\n");
+}
+
+function runAllTests() {
+    testInsertAndPrint();
+    testRemoveFirstAndLast();
+    testRemoveAtAndRemoveValue();
+    testGettersAndSearch();
+    testEdgeCases();
+}
+
+runAllTests();

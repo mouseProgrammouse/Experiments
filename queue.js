@@ -96,24 +96,72 @@ Queue.prototype.print = function () {
     return result.join(",");
 }
 
-const test = () => {
-    const q = new Queue();
-
-    console.log(q.isEmpty());
-    q.enqueue(1);
-    q.enqueue(2);
-    q.enqueue(3);
-    console.log(q.print());
-    console.log("isEmpty", q.isEmpty());
-    console.log(q.peek());
-    console.log(q.dequeue());
-    console.log(q.dequeue());
-    console.log(q.print());
-    console.log(q.peek()); 
-    console.log(q.dequeue()); 
-    console.log(q.dequeue());
-    console.log(q.print());
-    console.log("isEmpty", q.isEmpty()); 
+function testEnqueueDequeue() {
+    const queue = new Queue();
+    console.log("=== testEnqueueDequeue ===");
+    console.log("Is empty initially?", queue.isEmpty());
+    console.log("Peek on empty:", queue.peek());
+    console.log("Dequeue on empty:", queue.dequeue());
+    queue.enqueue("A");
+    queue.enqueue("B");
+    queue.enqueue("C");
+    console.log("After enqueues (A,B,C):", queue.print());
+    console.log("Is empty now?", queue.isEmpty());
+    console.log("Peek:", queue.peek());
+    const removed1 = queue.dequeue();
+    console.log("Dequeued:", removed1.value);
+    console.log("Queue now:", queue.print());
+    const removed2 = queue.dequeue();
+    console.log("Dequeued:", removed2.value);
+    console.log("Queue now:", queue.print());
+    const removed3 = queue.dequeue();
+    console.log("Dequeued:", removed3.value);
+    console.log("Queue now:", queue.print());
+    console.log("Is empty finally?", queue.isEmpty());
+    console.log("\n");
 }
 
-test();
+function testMultipleOps() {
+    const queue = new Queue();
+    console.log("=== testMultipleOps ===");
+    for (let i = 1; i <= 5; i++) {
+        queue.enqueue(i);
+    }
+    console.log("Queue after enqueue 1..5:", queue.print());
+    console.log("Dequeued:", queue.dequeue().value);
+    console.log("Dequeued:", queue.dequeue().value);
+    console.log("Queue now:", queue.print());
+    queue.enqueue(6);
+    queue.enqueue(7);
+    console.log("Queue after enqueue 6,7:", queue.print());
+    while (!queue.isEmpty()) {
+        console.log("Dequeued:", queue.dequeue().value);
+    }
+    console.log("After dequeue all:", queue.print());
+    console.log("Is empty?", queue.isEmpty()); 
+    console.log("\n");
+}
+
+function testEdgeCases() {
+    const queue = new Queue();
+    console.log("=== testEdgeCases ===");
+    console.log("Dequeue on empty:", queue.dequeue());
+    console.log("Peek on empty:", queue.peek());
+    queue.enqueue("X");
+    queue.enqueue("Y");
+    console.log("Queue after enqueues (X,Y):", queue.print());
+    console.log("Dequeued:", queue.dequeue().value);
+    console.log("Dequeued:", queue.dequeue().value);
+    console.log("After removing all:", queue.print());
+    console.log("Dequeue on empty again:", queue.dequeue());
+    console.log("\n");
+}
+
+
+function runAllTests() {
+    testEnqueueDequeue();
+    testMultipleOps();
+    testEdgeCases();
+}
+
+runAllTests();

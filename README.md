@@ -10,6 +10,7 @@ From the command line, run:
 ```sh
 node linkedList.js
 node queue.js
+node doublyLinkedList.js
 ```
 
 You’ll see console output showing the basic operations (like adding, removing, and printing) in action.
