@@ -19,7 +19,7 @@ stackWithArray.prototype.isEmpty = function () {
  * Size. Returns the number of elements in the stack.
  * O(1)
  */
-stackWithArray.prototype.size = function () {
+stackWithArray.prototype.sizeOf = function () {
     return this.size;
 }
 
@@ -64,11 +64,19 @@ stackWithArray.prototype.clear = function () {
 }
 
 /**
+ * Print.
+ * O(n)
+ */
+stackWithArray.prototype.print = function () {
+    return this.stack.join(" -> ");
+}
+
+/**
  * Contains. Checks if a given value exists in the stack.
  * O(n)
  */
-stackWithArray.prototype.contains = function () {
-    return this.stack.join(",");
+stackWithArray.prototype.contains = function (value) {
+    return this.stack.includes(value);
 }
 
 /**
@@ -147,9 +155,91 @@ stackWithLinkedList.prototype.push = function (value) {
 
     if (this.isEmpty()) {
         this.head = newNode;
+        this.size++;
+        return;
     }
 
     newNode.next = this.head;
     this.head = newNode;
     this.size++;
 }
+
+/**
+ * Сlear. Removes all element from stack.
+ * O(1)
+ */
+stackWithLinkedList.prototype.clear = function () {
+    this.head = null;
+    this.size = 0;
+}
+
+/**
+ * Contains. Checks if a given value exists in the stack.
+ * O(n)
+ */
+stackWithLinkedList.prototype.contains = function (value) {
+    let currentNode = this.head;
+
+    while (currentNode !== null) {
+        if (currentNode.value === value) return true;
+        currentNode = currentNode.next;
+    }
+
+    return false;
+}
+
+/**
+ * Print. Returns the stack as a list (for debugging or visualization).
+ * O(n)
+ */
+stackWithLinkedList.prototype.print = function () {
+    let currentNode = this.head, output = [];
+    while (currentNode !== null) {
+        output.push(currentNode.value);
+        currentNode = currentNode.next;
+    }
+
+    return output.join(" -> ")
+}
+
+/**
+ * Reverse. Reverses the order of elements in the stack.
+ * O(n)
+ */
+stackWithLinkedList.prototype.reverse = function () {
+    let currentNode = this.head, reversedStack = new stackWithLinkedList();
+    while (currentNode !== null) {
+        reversedStack.push(currentNode.value)
+        currentNode = currentNode.next;
+    }
+
+    this.head = reversedStack.head;
+    this.size = reversedStack.size;
+}
+
+function testStacks() {
+    const sArray = new stackWithArray();
+    const sList = new stackWithLinkedList();
+
+    const stacks = [sArray, sList];
+    
+    stacks.forEach((stack, i) => {
+        console.log(`\n--- Testing stack ${i === 0 ? "Array" : "LinkedList"} ---`);
+
+        stack.push(1);
+        stack.push(2);
+        stack.push(3);
+        console.log("Print:", stack.print ? stack.print() : "not implemented");
+        console.log("Peek:", stack.peek());
+        console.log("Size:", stack.sizeOf ? stack.sizeOf() : stack.size);
+        console.log("Contains 2:", stack.contains(2));
+        console.log("Pop:", stack.pop());
+        console.log("After pop:", stack.print ? stack.print() : "not implemented");
+        stack.reverse();
+        console.log("After reverse:", stack.print ? stack.print() : "not implemented");
+        stack.clear();
+        console.log("Is empty after clear:", stack.isEmpty());
+    });
+}
+
+testStacks();
