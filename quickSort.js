@@ -5,32 +5,54 @@
  *  - Elements less than the pivot
  *  - Elements greater than the pivot
  * Then it recursively repeats this process for the two groups.
+ * 
+ * Average Time Complexity: O(nlogn)
+ * Best-Case Time Complexity: O(nlogn)
+ * Worst-Case Time Complexity: O(n^2)
  */
 const quickSort = (arr, start, end) => {
+    // Base case: if the segment is empty or has one element, no need to sort
     if (start >= end) return;
 
-    let pivot = end, i = start;
+    // Choose the last element as the pivot
+    let pivot = end;
+    // 'i' will iterate from 'start' to just before 'pivot'
+    let i = start;
+
+    // Partition the array around the pivot
     while (i < pivot) {
+        // If current element is greater than or equal to the pivot's value
         if (arr[i] >= arr[pivot]) {
+
+            // If pivot and current element are next to each other, just swap them
             if (pivot - i === 1) {
-                // just swap
                 const temp = arr[pivot];
                 arr[pivot] = arr[i];
                 arr[i] = temp;
             }
+
+            // Otherwise, rotate three elements: 
+            // the pivot moves to the position pivot-1, 
+            // the element at pivot-1 moves to pivot, 
+            // and arr[i] is swapped with the old pivot's value.
             const temp = arr[pivot - 1];
             arr[pivot - 1] = arr[pivot];
             arr[pivot] = arr[i];
             arr[i] = temp;
+
+            // Decrement pivot to account for the newly placed element
             pivot--;
             continue;
         }
+
+        // Move to the next element if current is smaller than pivot's value
         i++;
     }
-    // partitioning
+
+    // Recursively sort the elements before and after the pivot
     quickSort(arr, start, pivot - 1);
     quickSort(arr, pivot + 1, end);
-}
+};
 
 function runQuickSortTest(name, input, expected) {
     console.log(`=== ${name} ===`);
