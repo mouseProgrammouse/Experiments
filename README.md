@@ -15,6 +15,8 @@ node doublyLinkedList.js
 node stack.js 0 # for array implementation
 node stack.js 1 # for linked list implementation
 node circularLinkedList.js
+# Sortings:
+node quickSort.js
 ```
 
 You’ll see console output showing the basic operations (like adding, removing, and printing) in action.
