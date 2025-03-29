@@ -18,6 +18,9 @@ node circularLinkedList.js
 # Sortings:
 node quickSort.js
 node mergeSort.js
+
+# Trees 🌳:
+node binarySearchTree.js
 ```
 
 You’ll see console output showing the basic operations (like adding, removing, and printing) in action.
