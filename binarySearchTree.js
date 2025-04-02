@@ -269,6 +269,38 @@ class BinarySearchTree {
         return Math.abs(rightSubtreeHeight - leftSubtreeHeight) > 1 ? false : true;
 
     }
+    /**
+     * Delete node.
+     */
+    #delete (currentNode, value) {
+        if (currentNode === null) return;
+            if (currentNode.value === value) return currentNode;
+
+            const node = currentNode.value > value ? this.#delete(currentNode.left, value) : this.#delete(currentNode.right, value);
+            if (node) {
+                // node is leaf
+                if (node.right === null && node.left === null) {
+                    if (currentNode.right === node) currentNode.right = null;
+                    if (currentNode.left === node) currentNode.left = null;
+                } else if (node.right !== null && node.left !== null) {
+                    // looking for a minimal value node
+                    const minValueInRightSubtree = this.#findMin(node.right);
+                    node.value = minValueInRightSubtree;
+                    this.#delete(node.right, minValueInRightSubtree);
+                } else if (node.right !== null) {
+                    // right
+                    currentNode.right === node ? currentNode.right = node.right : currentNode.left = node.right;
+                } else if (node.left !== null) {
+                    // left
+                    currentNode.right === node ? currentNode.right = node.left : currentNode.left = node.left;
+                }
+            }
+    }
+    delete (value) {
+        if (this.isEmpty()) return;
+
+        this.#delete(this.root, value);
+    }
 }
 
 // ================== BST Test Code ======================
