@@ -302,9 +302,50 @@ class BinarySearchTree {
 
         this.#delete(this.root, value);
     }
+
+    /**
+     * Balance a Tree.
+     * 1st method:
+     *  Rebuild the BST from its sorted order
+     * Step 1: Do an inorder traversal of the BST to get a sorted array of all the nodes.
+     * Step 2: Rebuild the BST by picking the middle element as the root, recursively.
+     */
+    #inordertraversal (arr, currNode) {
+        if (!currNode) return;
+        this.#inordertraversal(arr, currNode.left);
+        arr.push(currNode.value);
+        this.#inordertraversal(arr, currNode.right);
+    }
+    #rebalance (arr, left, right) {
+        if (right < left) return null;
+
+        // get middle element
+        const mid = left + Math.floor((right - left) / 2);
+        // create Node
+        const newNode = new Node(arr[mid]);
+        // fill left
+        newNode.left = this.#rebalance(arr, left, mid - 1);
+        // fill right
+        newNode.right = this.#rebalance(arr, mid + 1, right);
+        //return node
+        return newNode;
+    }
+    rebalance () {
+        const inOrderTraversalArr = [];
+        this.#inordertraversal(inOrderTraversalArr, this.root);
+        this.root = this.#rebalance(inOrderTraversalArr, 0, inOrderTraversalArr.length - 1)
+    }
 }
 
 // ================== BST Test Code ======================
+
+/**
+ * Helper function to measure the height of a tree.
+ */
+function treeHeight(node) {
+    if (!node) return -1;
+    return 1 + Math.max(treeHeight(node.left), treeHeight(node.right));
+}
 
 /**
  * Helper function to run a test on the BST.
@@ -314,7 +355,7 @@ class BinarySearchTree {
  *   expectedMin: the minimum value we expect in the BST
  *   expectedMax: the maximum value we expect in the BST
  */
-function runBSTTest(name, input, expectedArray, expectedMin, expectedMax) {
+function runBSTTest(name, input, expectedArray, expectedMin, expectedMax, shouldTestRebalance = false) {
     console.log(`=== ${name} ===`);
     
     // Create a new BST and bulk insert all input values
@@ -345,6 +386,25 @@ function runBSTTest(name, input, expectedArray, expectedMin, expectedMax) {
     console.log("Expected max:  ", expectedMax);
     console.log("Actual max:    ", actualMax);
     console.log("Pass max?      ", actualMax === expectedMax);
+
+    if (shouldTestRebalance) {
+        console.log("--- Rebalance Tests ---");
+        const heightBefore = treeHeight(bst.root);
+        console.log("Height before rebalance:", heightBefore);
+
+        bst.rebalance();
+
+        const heightAfter = treeHeight(bst.root);
+        console.log("Height after rebalance: ", heightAfter);
+
+        const arrayAfterRebalance = bst.toArray();
+        console.log("Array after rebalance:  ", arrayAfterRebalance);
+
+        console.log("Pass inorder after rebalance?", 
+            JSON.stringify(arrayAfterRebalance) === JSON.stringify(expectedArray)
+        );
+        console.log("Height reduced?", heightAfter < heightBefore);
+    }
 
     console.log("\n");
 }
@@ -377,7 +437,8 @@ function testBSTBasicCases() {
         [1, 2, 3, 4, 5],
         [1, 2, 3, 4, 5],
         1,
-        5
+        5,
+        true // <<< test rebalance too
     );
 
     // Reverse sorted
@@ -386,7 +447,8 @@ function testBSTBasicCases() {
         [5, 4, 3, 2, 1],
         [1, 2, 3, 4, 5],
         1,
-        5
+        5,
+        true
     );
 
     // Random order
@@ -395,7 +457,8 @@ function testBSTBasicCases() {
         [4, 2, 7, 1, 9, 3],
         [1, 2, 3, 4, 7, 9],
         1,
-        9
+        9,
+        true
     );
 
     // === Delete some after insertion ===
@@ -413,7 +476,6 @@ function testBSTBasicCases() {
     console.log("\n");
 }
 
-
 /**
  * Test various edge/corner cases.
  */
@@ -424,7 +486,8 @@ function testBSTEdgeCases() {
         [3, 3, 3, 3],
         [3],
         3,
-        3
+        3,
+        true
     );
 
     // With negatives
@@ -433,7 +496,8 @@ function testBSTEdgeCases() {
         [0, -3, 2, -8, 7, 1],
         [-8, -3, 0, 1, 2, 7],
         -8,
-        7
+        7,
+        true
     );
 
     // Duplicates and negatives
@@ -442,7 +506,8 @@ function testBSTEdgeCases() {
         [5, -1, 4, -1, 0, 5],
         [-1, 0, 4, 5],
         -1,
-        5
+        5,
+        true
     );
 
     // === Delete some after insertion ===
@@ -460,7 +525,6 @@ function testBSTEdgeCases() {
     console.log("\n");
 }
 
-
 /**
  * Runs all BST tests.
  */
@@ -469,5 +533,4 @@ function runAllBSTTests() {
     testBSTEdgeCases();
 }
 
-// Finally, call the function to run everything.
 runAllBSTTests();
