@@ -269,6 +269,39 @@ class BinarySearchTree {
         return Math.abs(rightSubtreeHeight - leftSubtreeHeight) > 1 ? false : true;
 
     }
+    /**
+     * Delete node.
+     */
+    #delete (currentNode, value) {
+        if (currentNode === null) return null;
+
+        console.log(currentNode.value);
+        if (currentNode.value < value) {
+            currentNode.right = this.#delete(currentNode.right, value);
+        } else if (currentNode.value > value) {
+            currentNode.left = this.#delete(currentNode.left, value);
+        } else {
+            //the node has one leaf
+            if (currentNode.right === null) {
+                return currentNode.left;
+            } else if (currentNode.left === null) {
+                return currentNode.right;
+            }
+            // found a value to replace
+            let minNode = currentNode.right;
+            while (minNode.left !== null)
+                minNode = minNode.left;
+            currentNode.value = minNode.value;
+            currentNode.right = this.#delete(currentNode.right, minNode.value);
+        }
+
+        return currentNode;
+    }
+    delete (value) {
+        if (this.isEmpty()) return;
+
+        this.#delete(this.root, value);
+    }
 }
 
 // ================== BST Test Code ======================
@@ -323,10 +356,10 @@ function testBSTBasicCases() {
     // Empty
     runBSTTest(
         "Empty array",
-        [],      // input
-        [],      // expected in-order array
-        undefined, // expectedMin
-        undefined  // expectedMax
+        [],      
+        [],      
+        undefined, 
+        undefined  
     );
 
     // Single
@@ -364,14 +397,28 @@ function testBSTBasicCases() {
         1,
         9
     );
+
+    // === Delete some after insertion ===
+    console.log("=== Delete after Random order ===");
+    const bst = new BinarySearchTree();
+    bst.bulkInsert([4, 2, 7, 1, 9, 3]);
+    bst.delete(7); // delete a node with one child
+    bst.delete(2); // delete a node with two children
+    console.log("Expected array after delete: [1, 3, 4, 9]");
+    console.log("Actual array after delete:  ", bst.toArray());
+    console.log("Expected min: 1");
+    console.log("Actual min:  ", bst.findMin());
+    console.log("Expected max: 9");
+    console.log("Actual max:  ", bst.findMax());
+    console.log("\n");
 }
+
 
 /**
  * Test various edge/corner cases.
  */
 function testBSTEdgeCases() {
     // All same values — duplicates ignored by your BST
-    // We expect only a single '3' to remain.
     runBSTTest(
         "All same values",
         [3, 3, 3, 3],
@@ -380,7 +427,7 @@ function testBSTEdgeCases() {
         3
     );
 
-    // Negative numbers
+    // With negatives
     runBSTTest(
         "With negatives",
         [0, -3, 2, -8, 7, 1],
@@ -389,8 +436,7 @@ function testBSTEdgeCases() {
         7
     );
 
-    // Duplicates + negatives
-    // The BST insert code ignores duplicates, so -1 will appear only once, 5 only once.
+    // Duplicates and negatives
     runBSTTest(
         "Duplicates and negatives",
         [5, -1, 4, -1, 0, 5],
@@ -398,7 +444,22 @@ function testBSTEdgeCases() {
         -1,
         5
     );
+
+    // === Delete some after insertion ===
+    console.log("=== Delete after With negatives ===");
+    const bst = new BinarySearchTree();
+    bst.bulkInsert([0, -3, 2, -8, 7, 1]);
+    bst.delete(0);  // deleting root
+    bst.delete(2);  // deleting node with child
+    console.log("Expected array after delete: [-8, -3, 1, 7]");
+    console.log("Actual array after delete:  ", bst.toArray());
+    console.log("Expected min: -8");
+    console.log("Actual min:  ", bst.findMin());
+    console.log("Expected max: 7");
+    console.log("Actual max:  ", bst.findMax());
+    console.log("\n");
 }
+
 
 /**
  * Runs all BST tests.
