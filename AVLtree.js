@@ -34,15 +34,34 @@ class AVLTree {
 
     /**
      * Method will return:
-     * -1 till 1 - tree is balanced
-     * < -1 - left subtree is greater 
-     * > 1 - right subtree is greater
+     * in range -1 to 1 - tree is balanced
+     * If BF is +2, it means left-heavy
+     * If BF is -2, it means right-heavy
      */
     #isBalanced () {
         const rigthSubTreeHeight = this.#height(this.root.right);
-        const leftSubTree = this.#height(this.root.left);
+        const leftSubTreeHeight = this.#height(this.root.left);
 
-        return rigthSubTreeHeight - leftSubTree;
+        return leftSubTreeHeight - rigthSubTreeHeight;
+    }
+
+    #rightRotate (nodeToRotate) {
+        const leftChild = nodeToRotate.left;
+        const tempChild = leftChild.right;
+
+        leftChild.right = nodeToRotate;
+        nodeToRotate.left = tempChild;
+        return leftChild;
+    }
+
+    #leftRotate (nodeToRotate) {
+        const rightChild = nodeToRotate.right;
+        const tempChild = rightChild.left;
+
+        rightChild.left = nodeToRotate;
+        nodeToRotate.right = tempChild;
+
+        return rightChild;
     }
 
     inOrderTraversal (currentNode) {
@@ -83,10 +102,13 @@ class AVLTree {
         }
 
         this.#insert(this.root, value);
+        const balanceFactor = this.#isBalanced();
 
-        if (!this.#isBalanced()) {
-            this.inOrderTraversal(this.root);
-            console.log("-------");
+        // check imbalanced rules
+        if (balanceFactor < -1) { // left heavy
+
+        } else if (balanceFactor > 1) { // right heavy
+
         }
     }
 }
