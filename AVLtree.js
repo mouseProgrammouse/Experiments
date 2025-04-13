@@ -142,27 +142,89 @@ class AVLTree {
             this.root = this.#leftRotate(this.root);
         }
     }
+
+    #smallest (currentNode) {
+        if (currentNode === null) return null;
+        if (currentNode.left === null) return currentNode.value;
+
+        return this.#smallest(currentNode.left);
+    }
+    #delete (prevNode, currentNode, value) {
+        if (currentNode === null) return null;
+
+        if (currentNode.value === value) {
+            // leaf -> we can delete it
+            if (currentNode.right === null && currentNode.left === null) {
+                // delete , we have to keep parent
+                if (currentNode === this.root) {
+                    this.root = null;
+                } else {
+                    prevNode[prevNode.right === currentNode ? "right" : "left"] = null;
+                }
+            } else {
+                // we have to find a smallest in right
+                if (currentNode.right && currentNode.left) {
+                    const smallestValue = this.#smallest(currentNode.right);
+                    currentNode.value = smallestValue !== null ? smallestValue : this.#smallest(currentNode.left);
+                    this.#delete(currentNode, currentNode.right, smallestValue);
+                } else {
+                    prevNode[prevNode.right === currentNode ? "right" : "left"] = currentNode.right !== null ? currentNode.right : currentNode.left;
+                }
+            }
+        } else if (value > currentNode.value) {
+            this.#delete(currentNode, currentNode.right, value);
+        } else {
+            this.#delete(currentNode, currentNode.left, value);
+        }
+    }
+    delete (value) {
+        this.#delete(null, this.root, value);
+
+        // check balance
+        const balanceFactor = this.#isBalanced();
+
+        if (balanceFactor < -1) { // right heavy
+            const rightHeight = this.#height(this.root.right.right); 
+            const leftHeight = this.#height(this.root.right.left);
+
+            if (leftHeight > rightHeight) {
+                this.root = this.#leftRotate(this.root.right);
+            }
+            this.root = this.#rightRotate(this.root);
+        }
+
+        if (balanceFactor > 1) { //left heavy
+            const rightHeight = this.#height(this.root.left.right);
+            const leftHeight = this.#height(this.root.left);
+
+            if (rightHeight > leftHeight) {
+                this.root = this.#rightRotate(this.root.left);
+            }
+            this.root = this.#leftRotate(this.root);
+        }
+    }
 }
 
 
 /**
- * Helper function to run a test on the AVLTree.
+ * Helper function to run a test on the AVLTree with deletes.
  *   name: string describing the test
- *   input: array of values to insert
- *   expectedArray: what we expect from inOrder traversal
- *   expectedMin: minimum value
- *   expectedMax: maximum value
+ *   inputValues: array of values to insert
+ *   deleteValues: array of values to delete
+ *   expectedInOrder: final expected in-order array
  */
-function runAVLInsertTest(name, inputValues, expectedInOrder) {
+function runAVLInsertDeleteTest(name, inputValues, deleteValues, expectedInOrder) {
     console.log(`=== ${name} ===`);
 
     const tree = new AVLTree();
 
     inputValues.forEach(value => tree.insert(value));
+    deleteValues.forEach(value => tree.delete(value));
 
     const actualInOrder = tree.inOrderArray();
 
     console.log("Inserted values:    ", inputValues);
+    console.log("Deleted values:     ", deleteValues);
     console.log("Expected in-order:  ", expectedInOrder);
     console.log("Actual in-order:    ", actualInOrder);
 
@@ -171,56 +233,64 @@ function runAVLInsertTest(name, inputValues, expectedInOrder) {
     console.log("\n");
 }
 
-function testAVLInsertBalancing() {
-    // Single insertion
-    runAVLInsertTest(
-        "Single insert",
+function testAVLInsertDeleteBalancing() {
+    // Delete leaf node
+    runAVLInsertDeleteTest(
+        "Delete leaf node",
+        [10, 5, 15],
+        [5],
+        [10, 15]
+    );
+
+    // Delete node with one child
+    runAVLInsertDeleteTest(
+        "Delete node with one child",
+        [10, 5, 15, 12],
+        [15],
+        [5, 10, 12]
+    );
+
+    // Delete node with two children
+    runAVLInsertDeleteTest(
+        "Delete node with two children",
+        [10, 5, 20, 15, 30],
         [10],
-        [10]
+        [5, 15, 20, 30]
     );
 
-    // Insert sorted ascending (Right-heavy) => should rotate
-    runAVLInsertTest(
-        "Sorted ascending (Right-heavy)",
-        [1, 2, 3],
-        [1, 2, 3]
+    // Delete root node
+    runAVLInsertDeleteTest(
+        "Delete root node",
+        [10, 5, 15],
+        [10],
+        [5, 15]
     );
 
-    // Insert sorted descending (Left-heavy) => should rotate
-    runAVLInsertTest(
-        "Sorted descending (Left-heavy)",
-        [3, 2, 1],
-        [1, 2, 3]
-    );
-
-    // Left-Right (LR) case
-    runAVLInsertTest(
-        "Left-Right (LR case)",
-        [30, 10, 20],
-        [10, 20, 30]
-    );
-
-    // Right-Left (RL) case
-    runAVLInsertTest(
-        "Right-Left (RL case)",
-        [10, 30, 20],
-        [10, 20, 30]
-    );
-
-    // Random insertions
-    runAVLInsertTest(
-        "Random insertion",
-        [5, 2, 8, 1, 4, 7, 9],
-        [1, 2, 4, 5, 7, 8, 9]
-    );
-
-    // Complex unbalanced input
-    runAVLInsertTest(
-        "Complex unbalanced input",
+    // Multiple deletions
+    runAVLInsertDeleteTest(
+        "Multiple deletions",
         [50, 20, 70, 10, 30, 60, 80, 5],
-        [5, 10, 20, 30, 50, 60, 70, 80]
+        [20, 70],
+        [5, 10, 30, 50, 60, 80]
+    );
+
+    // Insert sorted, then delete middle
+    runAVLInsertDeleteTest(
+        "Insert sorted ascending then delete middle",
+        [1, 2, 3],
+        [2],
+        [1, 3]
+    );
+
+    // Complex deletes and balancing
+    runAVLInsertDeleteTest(
+        "Complex unbalanced delete",
+        [40, 20, 60, 10, 30, 50, 70, 5, 15, 25, 35],
+        [20, 60, 40],
+        [5, 10, 15, 25, 30, 35, 50, 70]
     );
 }
 
+
 // Run the tests
-testAVLInsertBalancing();
+testAVLInsertDeleteBalancing();
