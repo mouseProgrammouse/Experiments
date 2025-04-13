@@ -74,6 +74,19 @@ class AVLTree {
         this.inOrderTraversal(currentNode.right);
     }
 
+    #inOrderArray (currentNode, result) {
+        if (currentNode === null) return;
+
+        this.#inOrderArray(currentNode.left, result);
+        result.push(currentNode.value);
+        this.#inOrderArray(currentNode.right, result);
+    }
+    inOrderArray () {
+        const result = [];
+        this.#inOrderArray(this.root, result);
+        return result;
+    }
+
     #insert (currentNode, value) {
         if (value > currentNode.value) {
             if (currentNode.right === null) {
@@ -103,23 +116,111 @@ class AVLTree {
 
         this.#insert(this.root, value);
         const balanceFactor = this.#isBalanced();
+        console.log(this.inOrderArray());
+        console.log(this.#isBalanced());
+        console.log(this.root.value);
 
         // check imbalanced rules
-        if (balanceFactor < -1) { // left heavy
-
-        } else if (balanceFactor > 1) { // right heavy
-
+        if (balanceFactor > 1) { // left heavy
+            // LL - rotation
+            const leftHeight = this.#height(this.root.left.left);
+            const rightHeight = this.#height(this.root.left.right);
+            if (rightHeight > leftHeight) {
+                // LR -rotation
+                this.root = this.#leftRotate(this.root.left);
+            }
+            // LL - case
+            this.root = this.#rightRotate(this.root);
+        } else if (balanceFactor < -1) { // right heavy
+            const leftHeight = this.#height(this.root.right.left);
+            const rightHeight = this.#height(this.root.right.right);
+            if (leftHeight > rightHeight) {
+                // RL - case
+                this.root = this.#rightRotate(this.root.right);
+            }
+            // RR - case
+            this.root = this.#leftRotate(this.root);
         }
     }
 }
 
 
-const AVLTreeInst = new AVLTree();
-AVLTreeInst.insert(10);
-AVLTreeInst.insert(5);
-AVLTreeInst.insert(3);
-AVLTreeInst.insert(11);
-AVLTreeInst.insert(9);
-AVLTreeInst.insert(8);
+/**
+ * Helper function to run a test on the AVLTree.
+ *   name: string describing the test
+ *   input: array of values to insert
+ *   expectedArray: what we expect from inOrder traversal
+ *   expectedMin: minimum value
+ *   expectedMax: maximum value
+ */
+function runAVLInsertTest(name, inputValues, expectedInOrder) {
+    console.log(`=== ${name} ===`);
 
+    const tree = new AVLTree();
 
+    inputValues.forEach(value => tree.insert(value));
+
+    const actualInOrder = tree.inOrderArray();
+
+    console.log("Inserted values:    ", inputValues);
+    console.log("Expected in-order:  ", expectedInOrder);
+    console.log("Actual in-order:    ", actualInOrder);
+
+    const passed = JSON.stringify(actualInOrder) === JSON.stringify(expectedInOrder);
+    console.log("Pass in-order?      ", passed ? "✅" : "❌");
+    console.log("\n");
+}
+
+function testAVLInsertBalancing() {
+    // Single insertion
+    runAVLInsertTest(
+        "Single insert",
+        [10],
+        [10]
+    );
+
+    // Insert sorted ascending (Right-heavy) => should rotate
+    runAVLInsertTest(
+        "Sorted ascending (Right-heavy)",
+        [1, 2, 3],
+        [1, 2, 3]
+    );
+
+    // Insert sorted descending (Left-heavy) => should rotate
+    runAVLInsertTest(
+        "Sorted descending (Left-heavy)",
+        [3, 2, 1],
+        [1, 2, 3]
+    );
+
+    // Left-Right (LR) case
+    runAVLInsertTest(
+        "Left-Right (LR case)",
+        [30, 10, 20],
+        [10, 20, 30]
+    );
+
+    // Right-Left (RL) case
+    runAVLInsertTest(
+        "Right-Left (RL case)",
+        [10, 30, 20],
+        [10, 20, 30]
+    );
+
+    // Random insertions
+    runAVLInsertTest(
+        "Random insertion",
+        [5, 2, 8, 1, 4, 7, 9],
+        [1, 2, 4, 5, 7, 8, 9]
+    );
+
+    // Complex unbalanced input
+    runAVLInsertTest(
+        "Complex unbalanced input",
+        [50, 20, 70, 10, 30, 60, 80, 5],
+        [5, 10, 20, 30, 50, 60, 70, 80]
+    );
+}
+
+// Run the tests
+testAVLInsertBalancing();
